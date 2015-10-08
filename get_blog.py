@@ -46,7 +46,7 @@ def get_content():
         Nowaday = str(year)+"-"+str(mon)+"-"+str(day)
         Nowaday1 = "20"+str(year)+"-"+str(mon)+"-"+str(day)+" "+str(hour)+":"+str(min)+":"+str(sec)
         url = urllib2.urlopen("http://uzone.univs.cn/blog/" + urls[c])
-        url_json = json.dumps(urls[c])
+        url_json = json.dumps("http://uzone.univs.cn/blog/" + urls[c])
         soup = BeautifulSoup(url.read(), "html.parser")
         tm = soup.title.string
         tm_json = json.dumps(tm)
@@ -58,22 +58,28 @@ def get_content():
         sj_json = json.dumps(sj1.group())
         sj_test = re.search(r"\d+-\d+-\d+", str(sj)).group()
         if sj_test != Nowaday:
-            conn = MySQLdb.connect(host='localhost', user='你的用户名', passwd='你的密码', db='你的数据库', charset='utf8')
+            conn = MySQLdb.connect(host='localhost', user='root', passwd='你的密码', db='你的数据库', charset='utf8')
             cursor = conn.cursor()
            # cursor.execute("""create database if not exists 你的数据库名""")
            # conn.select_db('你的数据库名')
-           # cursor.execute("""create table if not exists article(author int, time1 int, edittime int, eidtor char(100), from1 char(100), fromurl char(100), type1 int, thumb char(100), top int, click int, realclick int, title char(100), content text)""")
+           # cursor.execute("""create table if not exists cai_article(author int, `time` int, edittime int, eidtor char(100), `from` char(100), fromurl char(100), `type` int, thumb char(100), top int, click int, realclick int, title char(100), content text)""")
             num1 = random.randrange(100, 200)
-            value = (1, int_time(sj_now), int_time(Nowaday1), 'xxxxxxxx', 'xxxxxxxx', url_json, 0, '0', 0, num1, 0, tm_json, zw_json)
-            try:
+            value = (1, int_time(sj_now), int_time(Nowaday1), '工大学子', '大学生在线', "http://uzone.univs.cn/blog/" + urls[c], 0, '0', 0, num1, 0, tm_json, zw_json)
+            #try:
+            cursor.execute("select fromurl from cai_article where fromurl=%s"%url_json)
+            result = cursor.fetchall()
+            if not result:
+                print "not record"
                 # Execute the SQL command
-                cursor.execute("""insert into zx_article(author, time1, edittime, eidtor, from1, fromurl, type1, thumb, top, click, realclick, title, content) values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)""", value)
+                cursor.execute("""insert into cai_article(author, `time`, edittime, eidtor, `from`, fromurl, `type`, thumb, top, click, realclick, title, content) values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)""", value)
                 # Commit your changes in the database
                 conn.commit()
                 print "inserted"
-            except:
+            else:
+                print "exist"
+            #except:
                  #Rollback in case there is any error
-                print "rollback"
+             #   print "rollback"
              #disconnect from server
             conn.close()
 
