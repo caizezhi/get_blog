@@ -83,6 +83,9 @@ def get_content():
                 print "rollback"
              #disconnect from server
             conn.close()
+        else:
+            print "无更新"
+    return 0
 
 
 while 1:
